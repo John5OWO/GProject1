@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.face.mapper.FaceUserMapper">
+
+	<resultMap type="FaceUser" id="FaceUserResult">
+		<result property="id"    column="id"    />
+		<result property="name"    column="name"    />
+		<result property="email"    column="email"    />
+		<result property="photoPath"    column="photo_path"    />
+		<result property="isSubscribedAlarm"    column="is_subscribed_alarm"    />
+		<result property="createTime"    column="create_time"    />
+	</resultMap>
+
+	<sql id="selectFaceUserVo">
+		select id, name, email, photo_path, is_subscribed_alarm, create_time from face_user
+	</sql>
+
+	<select id="selectFaceUserList" parameterType="FaceUser" resultMap="FaceUserResult">
+		<include refid="selectFaceUserVo"/>
+		<where>
+			<if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+			<if test="email != null  and email != ''"> and email = #{email}</if>
+			<if test="photoPath != null  and photoPath != ''"> and photo_path = #{photoPath}</if>
+			<if test="isSubscribedAlarm != null "> and is_subscribed_alarm = #{isSubscribedAlarm}</if>
+		</where>
+	</select>
+
+	<select id="selectFaceUserById" parameterType="Long" resultMap="FaceUserResult">
+		<include refid="selectFaceUserVo"/>
+		where id = #{id}
+	</select>
+
+	<insert id="insertFaceUser" parameterType="FaceUser" useGeneratedKeys="true" keyProperty="id">
+		insert into face_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name != null and name != ''">name,</if>
+			<if test="email != null and email != ''">email,</if>
+			<if test="photoPath != null and photoPath != ''">photo_path,</if>
+			<if test="isSubscribedAlarm != null">is_subscribed_alarm,</if>
+			<if test="createTime != null">create_time,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name != null and name != ''">#{name},</if>
+			<if test="email != null and email != ''">#{email},</if>
+			<if test="photoPath != null and photoPath != ''">#{photoPath},</if>
+			<if test="isSubscribedAlarm != null">#{isSubscribedAlarm},</if>
+			<if test="createTime != null">#{createTime},</if>
+		</trim>
+	</insert>
+
+	<update id="updateFaceUser" parameterType="FaceUser">
+		update face_user
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="name != null and name != ''">name = #{name},</if>
+			<if test="email != null and email != ''">email = #{email},</if>
+			<if test="photoPath != null and photoPath != ''">photo_path = #{photoPath},</if>
+			<if test="isSubscribedAlarm != null">is_subscribed_alarm = #{isSubscribedAlarm},</if>
+			<if test="createTime != null">create_time = #{createTime},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<delete id="deleteFaceUserById" parameterType="Long">
+		delete from face_user where id = #{id}
+	</delete>
+
+	<delete id="deleteFaceUserByIds" parameterType="String">
+		delete from face_user where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id="selectSubscribedUsers" resultType="FaceUser">
+		SELECT email FROM face_user
+		WHERE is_subscribed_alarm = #{isSubscribed}
+	</select>
+</mapper>
